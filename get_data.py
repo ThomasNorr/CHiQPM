@@ -47,12 +47,18 @@ def get_data(dataset, crop = True, img_size=448):
     Raises:
         NotImplementedError: If FGVCAircraft dataset is requested (not yet implemented)
         NotImplementedError: If ImageNet is used with img_size != 224
+        ValueError: If invalid dataset name is provided
     
     Note:
         - Batch size is 16 for fine-grained datasets and 64 for ImageNet
         - ImageNet uses a specific augmentation strategy from the robustness package
         - Cropped images should be pre-computed following ProtoTree's preprocessing instructions
     """
+    # Validate dataset name
+    valid_datasets = ["CUB2011", "TravelingBirds", "StanfordCars", "ImageNet", "FGVCAircraft"]
+    if dataset not in valid_datasets:
+        raise ValueError(f"Invalid dataset '{dataset}'. Must be one of {valid_datasets[:-1]}")
+    
     batchsize = 16
     if dataset == "CUB2011":
         train_transform = get_augmentation(0.1, img_size, True,not crop, True, True, normalize_params["CUB2011"])
@@ -71,7 +77,7 @@ def get_data(dataset, crop = True, img_size=448):
         train_dataset = StanfordCarsClass(True, train_transform)
         test_dataset = StanfordCarsClass(False, test_transform)
     elif dataset == "FGVCAircraft":
-        raise NotImplementedError
+        raise NotImplementedError("FGVCAircraft dataset is not yet implemented")
 
     elif dataset == "ImageNet":
         # Defaults from the robustness package

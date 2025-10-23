@@ -63,19 +63,55 @@ def main(dataset, arch,seed=None, model_type="qsenn", do_dense=True,crop = True,
     
     Raises:
         AssertionError: If crop=True is used with datasets other than CUB2011 or TravelingBirds
+        ValueError: If invalid parameters are provided
     """
+    # Validate parameters
+    valid_datasets = ["CUB2011", "ImageNet", "TravelingBirds", "StanfordCars"]
+    if dataset not in valid_datasets:
+        raise ValueError(f"Invalid dataset '{dataset}'. Must be one of {valid_datasets}")
+    
+    valid_architectures = ["resnet50", "resnet34", "resnet18"]
+    if arch not in valid_architectures:
+        raise ValueError(f"Invalid architecture '{arch}'. Must be one of {valid_architectures}")
+    
+    valid_model_types = ["chiqpm", "qpm", "qsenn", "sldd"]
+    if model_type not in valid_model_types:
+        raise ValueError(f"Invalid model_type '{model_type}'. Must be one of {valid_model_types}")
+    
+    if n_features <= 0:
+        raise ValueError(f"n_features must be positive, got {n_features}")
+    
+    if n_per_class <= 0:
+        raise ValueError(f"n_per_class must be positive, got {n_per_class}")
+    
+    if n_per_class > n_features:
+        raise ValueError(f"n_per_class ({n_per_class}) cannot exceed n_features ({n_features})")
+    
     # create random seed, if seed is None
     if seed is None:
         seed = np.random.randint(0, 1000000)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    
     dataset_key = dataset
     if crop:
-        assert dataset in ["CUB2011","TravelingBirds"]
+        if dataset not in ["CUB2011","TravelingBirds"]:
+            raise ValueError(f"Cropping is only supported for CUB2011 and TravelingBirds, not {dataset}")
         dataset_key += "_crop"
+    
     log_dir = Path.home()/f"tmp/{arch}/{dataset_key}/{seed}/"
     log_dir.mkdir(parents=True, exist_ok=True)
     tee = Tee(log_dir / "log.txt") # save log to file
+    
+    print(f"Starting training with configuration:")
+    print(f"  Dataset: {dataset}")
+    print(f"  Architecture: {arch}")
+    print(f"  Model type: {model_type}")
+    print(f"  Seed: {seed}")
+    print(f"  Features: {n_features} total, {n_per_class} per class")
+    print(f"  Image size: {img_size}")
+    print(f"  Log directory: {log_dir}")
+    
     n_classes = dataset_constants[dataset]["num_classes"]
     train_loader, test_loader = get_data(dataset, crop=crop, img_size=img_size)
     model = get_model(arch, n_classes, reduced_strides)
@@ -84,27 +120,37 @@ def main(dataset, arch,seed=None, model_type="qsenn", do_dense=True,crop = True,
     optimizer, schedule, dense_epochs =get_optimizer(model,   OptimizationSchedule)
     if not os.path.exists(log_dir / "Trained_DenseModel.pth"):
         if do_dense:
+            print(f"Training dense model for {dense_epochs} epochs...")
             for epoch in trange(dense_epochs):
                 model = train(model, train_loader, optimizer, fdl, 0,epoch)
                 schedule.step()
                 if epoch % 5 == 0:
                     test(model, test_loader,epoch)
         else:
-            print("Using pretrained model, only makes sense for ImageNet")
+            print("Using pretrained model (skipping dense training)")
+            if dataset != "ImageNet":
+                print("Warning: Skipping dense training is primarily intended for ImageNet")
         torch.save(model.state_dict(), os.path.join(log_dir, f"Trained_DenseModel.pth"))
     else:
+        print("Loading existing dense model from disk...")
         model.load_state_dict(torch.load(log_dir / "Trained_DenseModel.pth", map_location="cpu" if not torch.cuda.is_available() else "cuda"))
+    
     if not  os.path.exists( log_dir/f"Results_DenseModel.json"):
+        print("Evaluating dense model...")
         metrics_dense = eval_model_on_all_qpm_metrics(model, test_loader, train_loader)
         json_save(os.path.join(log_dir, f"Results_DenseModel.json"), metrics_dense)
+    
+    print(f"Starting {model_type} finetuning...")
     final_model = finetune(model_type, model, train_loader, test_loader, log_dir, n_classes, seed, architecture_params[arch]["beta"], OptimizationSchedule, n_per_class, n_features)
     torch.save(final_model.state_dict(), os.path.join(log_dir,f"{model_type}_{n_features}_{n_per_class}_FinetunedModel.pth"))
+    
+    print(f"Evaluating finetuned {model_type} model...")
     if model_type == "chiqpm":
          metrics_finetuned = eval_model_on_all_chiqpm_metrics(final_model, test_loader, train_loader)
     else:
         metrics_finetuned = eval_model_on_all_qpm_metrics(final_model, test_loader, train_loader)
     json_save(os.path.join(log_dir, f"Results_{model_type}_{n_features}_{n_per_class}_FinetunedModel.json"), metrics_finetuned)
-    print("Done")
+    print("Training completed successfully!")
 
 
 
