@@ -7,7 +7,7 @@ Norrenbrock ,
 Timo Kaiser,  Sovan Biswas, Neslihan Kose, Ramesh Manuvinakurike,
 and Bodo Rosenhahn.
 
-Additonally, QPM from the ICLR 2025 paper
+Additionally, QPM from the ICLR 2025 paper
 [*QPM: Discrete Optimization for Globally Interpretable Image Classification*](https://openreview.net/forum?id=GlAeL0I8LX) by Thomas
 Norrenbrock , 
 Timo Kaiser,  Sovan Biswas, Ramesh Manuvinakurike,

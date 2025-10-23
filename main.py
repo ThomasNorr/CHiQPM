@@ -1,3 +1,21 @@
+"""
+CHiQPM Main Training Script
+
+This module provides the main entry point for training CHiQPM (Calibrated Hierarchical
+Interpretable QPM) models and related variants including QPM, Q-SENN, and SLDD.
+
+The training pipeline consists of:
+1. Dense model training (optional, can use pretrained models for ImageNet)
+2. Model evaluation on metrics
+3. Finetuning with feature selection and sparsification
+4. Final model evaluation
+
+Example usage:
+    python main.py --dataset CUB2011 --arch resnet50 --model_type chiqpm
+    
+For more options, run:
+    python main.py --help
+"""
 import os
 from argparse import ArgumentParser
 from pathlib import Path
@@ -22,6 +40,30 @@ from training.optim import get_optimizer, get_scheduler_for_model
 
 
 def main(dataset, arch,seed=None, model_type="qsenn", do_dense=True,crop = True, n_features = 50, n_per_class=5, img_size=448, reduced_strides=False):
+    """
+    Main training function for CHiQPM and related models.
+    
+    This function orchestrates the complete training pipeline including dense model
+    training, evaluation, feature selection, and finetuning.
+    
+    Args:
+        dataset (str): Dataset name, one of ["CUB2011", "ImageNet", "TravelingBirds", "StanfordCars"]
+        arch (str): Backbone architecture, one of ["resnet50", "resnet34", "resnet18"]
+        seed (int, optional): Random seed for reproducibility. If None, a random seed is generated.
+        model_type (str): Type of interpretable model to train, one of ["chiqpm", "qpm", "qsenn", "sldd"]
+        do_dense (bool): Whether to train the dense model from scratch. Set to False to use pretrained models (ImageNet).
+        crop (bool): Whether to use cropped images based on ground truth boundaries (CUB/TravelingBirds only)
+        n_features (int): Total number of features to select for the sparse model
+        n_per_class (int): Number of features to assign to each class
+        img_size (int): Input image size (default 448, ImageNet uses 224)
+        reduced_strides (bool): Whether to use reduced strides in ResNet (improves feature map resolution)
+    
+    Returns:
+        None. Saves trained models and metrics to disk.
+    
+    Raises:
+        AssertionError: If crop=True is used with datasets other than CUB2011 or TravelingBirds
+    """
     # create random seed, if seed is None
     if seed is None:
         seed = np.random.randint(0, 1000000)
@@ -58,12 +100,11 @@ def main(dataset, arch,seed=None, model_type="qsenn", do_dense=True,crop = True,
     final_model = finetune(model_type, model, train_loader, test_loader, log_dir, n_classes, seed, architecture_params[arch]["beta"], OptimizationSchedule, n_per_class, n_features)
     torch.save(final_model.state_dict(), os.path.join(log_dir,f"{model_type}_{n_features}_{n_per_class}_FinetunedModel.pth"))
     if model_type == "chiqpm":
-         metrics_finetuned = eval_model_on_all_chiqpm_metrics(model, test_loader, train_loader)
+         metrics_finetuned = eval_model_on_all_chiqpm_metrics(final_model, test_loader, train_loader)
     else:
-        metrics_finetuned = eval_model_on_all_qpm_metrics(model, test_loader, train_loader)
+        metrics_finetuned = eval_model_on_all_qpm_metrics(final_model, test_loader, train_loader)
     json_save(os.path.join(log_dir, f"Results_{model_type}_{n_features}_{n_per_class}_FinetunedModel.json"), metrics_finetuned)
     print("Done")
-    pass
 
 
 

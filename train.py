@@ -1,3 +1,18 @@
+"""
+Training and Testing Module for CHiQPM
+
+This module provides the core training and testing functions used during
+the dense model training phase. It handles:
+- Training loop with multiple loss components
+- Validation/testing without gradient updates
+- Accuracy computation
+- Progress logging with tqdm
+
+The training process combines:
+1. Cross-entropy loss for classification
+2. Feature Diversity Loss (FDL) for feature separation
+3. Feature Grounding Loss (FGL) for interpretability (optional)
+"""
 import torch
 from tqdm import tqdm
 
@@ -6,6 +21,16 @@ from training.utils import VariableLossLogPrinter
 
 
 def get_acc(outputs, targets):
+    """
+    Calculate classification accuracy.
+    
+    Args:
+        outputs: Tensor of shape (batch_size, n_classes) containing logits
+        targets: Tensor of shape (batch_size,) containing target class indices
+    
+    Returns:
+        float: Accuracy as a percentage (0-100)
+    """
     _, predicted = torch.max(outputs.data, 1)
     total = targets.size(0)
     correct = (predicted == targets).sum().item()
@@ -14,6 +39,26 @@ def get_acc(outputs, targets):
 
 
 def train(model, train_loader, optimizer, fdl, lambda_feat, epoch):
+    """
+    Train the model for one epoch.
+    
+    Performs a single training epoch with combined loss functions including
+    cross-entropy, feature diversity loss, and optionally feature grounding loss.
+    
+    Args:
+        model: PyTorch model to train
+        train_loader: DataLoader for training data
+        optimizer: PyTorch optimizer
+        fdl: FeatureDiversityLoss instance for promoting feature diversity
+        lambda_feat: Scaling factor for Feature Grounding Loss (0 disables it)
+        epoch: Current epoch number for logging
+    
+    Returns:
+        model: Trained model (in training mode)
+    
+    Note:
+        The function automatically detects CUDA availability and moves data accordingly.
+    """
     model.train()
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     VariableLossPrinter = VariableLossLogPrinter()
@@ -49,6 +94,23 @@ def train(model, train_loader, optimizer, fdl, lambda_feat, epoch):
 
 
 def test(model, test_loader, epoch):
+    """
+    Evaluate the model on test data.
+    
+    Runs the model in evaluation mode (no gradient computation) and computes
+    accuracy and cross-entropy loss on the test set.
+    
+    Args:
+        model: PyTorch model to evaluate
+        test_loader: DataLoader for test data
+        epoch: Current epoch number for logging
+    
+    Returns:
+        None. Prints test metrics to console.
+    
+    Note:
+        This function does not return metrics but prints them via tqdm progress bar.
+    """
     model.eval()
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model = model.to(device)
