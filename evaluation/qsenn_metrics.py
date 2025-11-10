@@ -17,7 +17,7 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
         print("cub_alignment: ", cub_alignment)
         localizer = MultiKCrossChannelMaxPooledSum(range(1, 6), linear_matrix, None)
         batch_size = 300
-        for i in range(np.floor(len(features_train) / batch_size).astype(int)):
+        for i in range(np.floor(len(features_test) / batch_size).astype(int)):
             localizer(outputs_test[i * batch_size:(i + 1) * batch_size].to("cuda"),
                       feature_maps_test[i * batch_size:(i + 1) * batch_size].to("cuda"))
 
