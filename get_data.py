@@ -161,18 +161,7 @@ def get_augmentation(jitter,  size,  training,  random_center_crop, trivialAug, 
 
 class Lighting(object):
     """
-    Apply PCA-based lighting noise augmentation.
-    
-    Implements the lighting augmentation from "ImageNet Classification with Deep
-    Convolutional Neural Networks" (Krizhevsky et al., 2012). This adds noise
-    along the principal components of RGB pixel values in ImageNet.
-    
-    Reference: https://git.io/fhBOc
-    
-    Args:
-        alphastd (float): Standard deviation of the noise. Set to 0 to disable.
-        eigval (Tensor): Eigenvalues of the PCA components
-        eigvec (Tensor): Eigenvectors of the PCA components
+    Lighting noise (see https://git.io/fhBOc)
     """
 
     def __init__(self, alphastd, eigval, eigvec):

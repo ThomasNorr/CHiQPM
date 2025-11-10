@@ -46,7 +46,7 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
     
     Returns:
         dict: Dictionary containing computed metrics:
-            - "SID@5": Spatial Independence Diversity at k=5
+            - "SID@5": Scale-Invariant Diversity at k=5
             - "Class-Independence": Feature independence from class predictions
             - "Contrastiveness": GMM-based feature contrastiveness (1 - overlap)
             - "Structural Grounding": Alignment with ground truth class similarities (CUB only)
@@ -67,7 +67,7 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
             cub_overlap = 0
         print("cub_overlap: ", cub_overlap)
         
-        # Compute spatial diversity using SumNMax localization at multiple k values
+        # Compute SID@5
         soft_max_scaled_localizer = MultiKCrossChannelMaxPooledSum(range(1, 6), linear_matrix, None,
                                                                    func="SumNMax")
         batch_size = 300

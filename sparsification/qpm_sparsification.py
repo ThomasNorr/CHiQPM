@@ -30,7 +30,7 @@ def compute_qpm_feature_selection_and_assignment(model, train_loader, test_loade
     1. Extract features from the dense model
     2. Compute correlation matrix A (feature-class relationships)
     3. Compute diversity matrix R (feature-feature similarity)
-    4. Compute locality bias B (spatial grounding)
+    4. Compute locality bias B
     5. Solve optimization problem to select features and assign to classes
     
     Results are saved to disk to avoid recomputation.
