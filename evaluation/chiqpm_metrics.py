@@ -1,11 +1,11 @@
 """
 CHiQPM Evaluation Metrics Module
 
-This module provides evaluation functions specific to CHiQPM (Calibrated Hierarchical QPM),
-including conformal prediction set metrics alongside standard QPM metrics.
+This module provides evaluation functions specific to CHiQPM,
+including conformal prediction set metrics alongside standard metrics.
 
 The evaluation includes:
-- Standard QPM metrics (diversity, contrastiveness, correlation, etc.)
+- Standard metrics (diversity, contrastiveness, correlation, etc.)
 - Conformal prediction set metrics (coverage, set size, coherence)
 - Support for multiple conformal prediction methods (CHiQPM, APS, THR)
 """
@@ -35,18 +35,18 @@ def evaluate_ChiQPMMetrics(features_train,  outputs_train,  feature_maps_test,
     for the CHiQPM model.
     
     Args:
-        features_train (Tensor): Training set features after pooling
+        features_train (Tensor): Training set features after pooling and normalization
         outputs_train (Tensor): Training set model outputs (logits)
         feature_maps_test (Tensor): Test set feature maps before pooling
         outputs_test (Tensor): Test set model outputs (logits)
         linear_matrix (Tensor): Weight matrix of the final linear layer
         labels_train (Tensor): Training set ground truth labels
         labels_test (Tensor): Test set ground truth labels
-        features_test (Tensor): Test set features after pooling
+        features_test (Tensor): Test set features after pooling and normalization
     
     Returns:
         dict: Dictionary containing all computed metrics including:
-            - QPM metrics (diversity, contrastiveness, correlation, etc.)
+            - Standard metrics (diversity, contrastiveness, correlation, etc.)
             - CP metrics for different methods and accuracy levels
     """
     cp_set_metrics = get_set_metrics(features_test, outputs_test,labels_test, linear_matrix)
@@ -65,7 +65,7 @@ def get_set_metrics(features_test, outputs_test,labels_test,  weight):
     at various target accuracy levels (88%, 90%, 92.5%, 95%).
     
     Args:
-        features_test (Tensor): Test set features after pooling
+        features_test (Tensor): Test set features after pooling and normalization
         outputs_test (Tensor): Test set model outputs (logits)
         labels_test (Tensor): Test set ground truth labels
         weight (Tensor): Weight matrix of the final linear layer
@@ -76,11 +76,11 @@ def get_set_metrics(features_test, outputs_test,labels_test,  weight):
             where metrics include coverage_rate, average_size, and optionally set_coherence
     
     Note:
-        The data is split into calibration (10%) and test sets.
+        The data is split using 10 samples per class for calibration.
         Set coherence is only computed for CUB dataset (identified by test set size of 5794).
     """
     answer = {}
-    # Split features into calibration and test sets (10% for calibration)
+    # Split using 10 samples per class for calibration
     cal_logits, cal_labels, cal_features, test_logits, test_labels, test_features, test_indices = get_logits_and_labels(
         features_test, outputs_test, labels_test, 10,)
     for method in [ "CHiQPM", "APS", "THR",]:

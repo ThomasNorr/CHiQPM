@@ -7,11 +7,6 @@ the dense model training phase. It handles:
 - Validation/testing without gradient updates
 - Accuracy computation
 - Progress logging with tqdm
-
-The training process combines:
-1. Cross-entropy loss for classification
-2. Feature Diversity Loss (FDL) for feature separation
-3. Feature Grounding Loss (FGL) for interpretability (optional)
 """
 import torch
 from tqdm import tqdm

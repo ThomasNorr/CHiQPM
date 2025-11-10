@@ -1,19 +1,14 @@
 """
-QPM Feature Selection and Assignment Module
+Feature Selection and Assignment Module
 
-This module implements the core Quadratic Programming-based feature selection
-and assignment algorithm for QPM (Quantized Prototype Model). It computes and
-solves a constrained optimization problem to select the most discriminative and
-diverse features.
+This module implements the core feature selection and assignment algorithm.
+It computes and solves a constrained optimization problem to select the most
+discriminative and diverse features.
 
-The QPM problem optimizes:
+The optimization problem considers:
 - Feature-class correlation (A matrix)
 - Feature diversity via cosine similarity (R matrix)
 - Spatial locality bias (B vector)
-
-Reference:
-    Norrenbrock et al., "QPM: Discrete Optimization for Globally Interpretable
-    Image Classification", ICLR 2025
 """
 import os
 import sys
@@ -29,16 +24,16 @@ from sparsification.utils import get_feature_loaders
 
 def compute_qpm_feature_selection_and_assignment(model, train_loader, test_loader, log_dir, n_classes, seed, n_features, per_class, rho=0):
     """
-    Compute QPM feature selection and class assignment using quadratic programming.
+    Compute feature selection and class assignment.
     
-    This function performs the complete QPM feature selection pipeline:
+    This function performs the complete feature selection pipeline:
     1. Extract features from the dense model
     2. Compute correlation matrix A (feature-class relationships)
     3. Compute diversity matrix R (feature-feature similarity)
     4. Compute locality bias B (spatial grounding)
-    5. Solve QP problem to select features and assign to classes
+    5. Solve optimization problem to select features and assign to classes
     
-    Results are cached to disk to avoid recomputation.
+    Results are saved to disk to avoid recomputation.
     
     Args:
         model: Trained dense PyTorch model
@@ -49,7 +44,7 @@ def compute_qpm_feature_selection_and_assignment(model, train_loader, test_loade
         seed (int): Random seed for feature loader
         n_features (int): Total number of features to select
         per_class (int): Number of features to assign to each class
-        rho (float): Regularization parameter for hierarchical constraints (default: 0)
+        rho (float): Tree density parameter for hierarchical constraints (default: 0)
     
     Returns:
         tuple: (feature_sel, weight, mean, std)
@@ -59,12 +54,12 @@ def compute_qpm_feature_selection_and_assignment(model, train_loader, test_loade
             - std: Std values for feature normalization
     
     Note:
-        The function caches intermediate results (A, R, B matrices) and final results
-        (feature_sel, weight) to disk. On subsequent runs, cached values are loaded
+        The function saves intermediate results (A, R, B matrices) and final results
+        (feature_sel, weight) to disk. On subsequent runs, saved values are loaded
         instead of recomputing.
         
-        If no GPU is available after solving QP, the function exits as further
-        processing requires GPU acceleration.
+        If no GPU is available after solving the optimization, the function exits as
+        further processing requires GPU acceleration.
     """
     feature_loaders, metadata, device,args =  get_feature_loaders(seed, log_dir,train_loader, test_loader, model, n_classes, )
     full_train_dataset = torch.utils.data.ConcatDataset([feature_loaders['train'].dataset, feature_loaders['val'].dataset])

@@ -3,12 +3,6 @@ Model Finetuning Dispatcher Module
 
 This module provides a unified interface for finetuning different interpretable
 model variants (CHiQPM, QPM, Q-SENN, SLDD) after the initial dense model training.
-
-Each model type has its own specific finetuning procedure:
-- CHiQPM: Hierarchical feature selection with conformal prediction
-- QPM: Quadratic programming-based feature selection
-- Q-SENN: Quantized self-explaining neural network
-- SLDD: Sparse linear decomposition
 """
 from finetuning.chiqpm import finetune_chiqpm
 from finetuning.qpm import finetune_qpm
@@ -42,10 +36,6 @@ def finetune(key, model, train_loader, test_loader, log_dir, n_classes, seed, be
     
     Raises:
         ValueError: If an unknown model type key is provided
-    
-    Note:
-        The model is set to eval mode before finetuning begins.
-        CHiQPM uses additional hierarchical parameters (3, 30) for tree construction.
     """
     model.eval()
     if key == 'sldd':

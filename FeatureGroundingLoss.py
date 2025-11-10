@@ -2,8 +2,8 @@
 Feature Grounding Loss Module
 
 This module implements the Feature Grounding Loss, which encourages features
-to be grounded in their corresponding classes by maximizing the difference
-between target and non-target feature activations.
+to be grounded in their assigned classes by maximizing the difference
+between assigned and non-assigned feature activations.
 """
 import torch
 
@@ -13,8 +13,8 @@ def get_FeatureGroundingLoss(features, target, weight):
     Calculate the Feature Grounding Loss.
     
     Computes a loss that encourages features to have higher activations for their
-    target classes compared to non-target classes. The loss is the scaled difference
-    between mean non-target and mean target feature values.
+    assigned classes compared to non-assigned classes. The loss is the scaled difference
+    between mean non-assigned and mean assigned feature values.
     
     Args:
         features: Tensor of shape (batch_size, n_features) containing feature activations

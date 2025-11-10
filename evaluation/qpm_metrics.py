@@ -1,12 +1,12 @@
 """
-QPM Evaluation Metrics Module
+Evaluation Metrics Module
 
-This module provides comprehensive evaluation metrics for QPM (Quantized Prototype Model)
-and related interpretable models. It computes metrics related to:
+This module provides comprehensive evaluation metrics for interpretable models.
+It computes metrics related to:
 - Spatial diversity of features (SID@k)
 - Feature contrastiveness (GMM overlap)
 - Class independence
-- Structural grounding (alignment with ground truth attributes)
+- Structural grounding (alignment with ground truth class similarities)
 - Feature correlation
 
 These metrics assess the quality and interpretability of learned features.
@@ -27,14 +27,14 @@ from evaluation.utils import get_metrics_for_model
 def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_test,
                                outputs_test, linear_matrix,  labels_train, labels_test, features_test):
     """
-    Evaluate model on all QPM interpretability metrics.
+    Evaluate model on all interpretability metrics.
     
     Computes a comprehensive set of metrics that measure the quality and
     interpretability of learned features including diversity, dependency,
     contrastiveness, and alignment with ground truth.
     
     Args:
-        features_train (Tensor): Training set features after pooling, shape (n_train, n_features)
+        features_train (Tensor): Training set features after pooling and normalization, shape (n_train, n_features)
         outputs_train (Tensor): Training set model outputs (logits), shape (n_train, n_classes)
         feature_maps_test (Tensor): Test set feature maps before pooling, 
                                      shape (n_test, n_features, height, width)
@@ -42,14 +42,14 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
         linear_matrix (Tensor): Weight matrix of final layer, shape (n_classes, n_features)
         labels_train (Tensor): Training set ground truth labels, shape (n_train,)
         labels_test (Tensor): Test set ground truth labels, shape (n_test,)
-        features_test (Tensor): Test set features after pooling, shape (n_test, n_features)
+        features_test (Tensor): Test set features after pooling and normalization, shape (n_test, n_features)
     
     Returns:
         dict: Dictionary containing computed metrics:
             - "SID@5": Spatial Independence Diversity at k=5
             - "Class-Independence": Feature independence from class predictions
             - "Contrastiveness": GMM-based feature contrastiveness (1 - overlap)
-            - "Structural Grounding": Alignment with ground truth attributes (CUB only)
+            - "Structural Grounding": Alignment with ground truth class similarities (CUB only)
             - "Correlation": Mean absolute correlation between features
     
     Note:
@@ -93,13 +93,13 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
 
 def eval_model_on_all_qpm_metrics(model, test_loader, train_loader):
     """
-    Evaluate a QPM model on all interpretability metrics.
+    Evaluate a model on all interpretability metrics.
     
-    This is the main entry point for evaluating a trained QPM model.
+    This is the main entry point for evaluating a trained model.
     It extracts features and predictions from the model, then computes all metrics.
     
     Args:
-        model: Trained QPM PyTorch model
+        model: Trained PyTorch model
         test_loader: DataLoader for test data
         train_loader: DataLoader for training data
     

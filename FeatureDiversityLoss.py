@@ -16,7 +16,7 @@ Usage:
     loss = fdl(feature_maps, outputs)
 
 Reference:
-    This loss is described in the CHiQPM/QPM papers for promoting interpretable
+    This loss is described in the SLDD-Model paper for promoting interpretable
     feature diversity in deep neural networks.
 """
 import torch
