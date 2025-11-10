@@ -2,7 +2,7 @@
 Feature Grounding Loss Module
 
 This module implements the Feature Grounding Loss, which encourages features
-to be grounded in their assigned classes by maximizing the difference
+to detect shared general concepts of their assigned classes by maximizing the difference
 between assigned and non-assigned feature activations.
 """
 import torch

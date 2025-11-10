@@ -35,14 +35,14 @@ def evaluate_ChiQPMMetrics(features_train,  outputs_train,  feature_maps_test,
     for the CHiQPM model.
     
     Args:
-        features_train (Tensor): Training set features after pooling and normalization
+        features_train (Tensor): Training set features
         outputs_train (Tensor): Training set model outputs (logits)
         feature_maps_test (Tensor): Test set feature maps before pooling
         outputs_test (Tensor): Test set model outputs (logits)
         linear_matrix (Tensor): Weight matrix of the final linear layer
         labels_train (Tensor): Training set ground truth labels
         labels_test (Tensor): Test set ground truth labels
-        features_test (Tensor): Test set features after pooling and normalization
+        features_test (Tensor): Test set features
     
     Returns:
         dict: Dictionary containing all computed metrics including:
@@ -65,7 +65,7 @@ def get_set_metrics(features_test, outputs_test,labels_test,  weight):
     at various target accuracy levels (88%, 90%, 92.5%, 95%).
     
     Args:
-        features_test (Tensor): Test set features after pooling and normalization
+        features_test (Tensor): Test set features
         outputs_test (Tensor): Test set model outputs (logits)
         labels_test (Tensor): Test set ground truth labels
         weight (Tensor): Weight matrix of the final linear layer

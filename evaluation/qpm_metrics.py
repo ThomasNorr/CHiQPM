@@ -34,7 +34,7 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
     contrastiveness, and alignment with ground truth.
     
     Args:
-        features_train (Tensor): Training set features after pooling and normalization, shape (n_train, n_features)
+        features_train (Tensor): Training set features, shape (n_train, n_features)
         outputs_train (Tensor): Training set model outputs (logits), shape (n_train, n_classes)
         feature_maps_test (Tensor): Test set feature maps before pooling, 
                                      shape (n_test, n_features, height, width)
@@ -42,7 +42,7 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
         linear_matrix (Tensor): Weight matrix of final layer, shape (n_classes, n_features)
         labels_train (Tensor): Training set ground truth labels, shape (n_train,)
         labels_test (Tensor): Test set ground truth labels, shape (n_test,)
-        features_test (Tensor): Test set features after pooling and normalization, shape (n_test, n_features)
+        features_test (Tensor): Test set features, shape (n_test, n_features)
     
     Returns:
         dict: Dictionary containing computed metrics:
@@ -71,7 +71,7 @@ def evaluateALLMetricsForComps(features_train,  outputs_train,  feature_maps_tes
         soft_max_scaled_localizer = MultiKCrossChannelMaxPooledSum(range(1, 6), linear_matrix, None,
                                                                    func="SumNMax")
         batch_size = 300
-        for i in range(np.floor(len(features_train) / batch_size).astype(int)):
+        for i in range(np.floor(len(features_test) / batch_size).astype(int)):
             soft_max_scaled_localizer(outputs_test[i * batch_size:(i + 1) * batch_size].to("cuda"),
                                       feature_maps_test[i * batch_size:(i + 1) * batch_size].to("cuda"))
         diversity_sm_scaled = soft_max_scaled_localizer.get_result()[0][4].item()
