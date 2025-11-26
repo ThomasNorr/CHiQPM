@@ -1,25 +1,17 @@
 # CHiQPM: Calibrated Hierarchical Interpretable Image Classification
 
- 
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ThomasNorr/CHIQPM_Demo)
+
 This repository contains the code for the NeurIPS 2025 paper
 [*CHiQPM: Calibrated Hierarchical Interpretable Image Classification*](https://www.tnt.uni-hannover.de/papers/data/1801/Neurips2025_ChiQPM%20(12)%20(2).pdf) by Thomas
-Norrenbrock , 
-Timo Kaiser,  Sovan Biswas, Neslihan Kose, Ramesh Manuvinakurike,
-and Bodo Rosenhahn.
+Norrenbrock, Timo Kaiser, Sovan Biswas, Neslihan Kose, Ramesh Manuvinakurike, and Bodo Rosenhahn.
 
-Additionally, QPM from the ICLR 2025 paper
-[*QPM: Discrete Optimization for Globally Interpretable Image Classification*](https://openreview.net/forum?id=GlAeL0I8LX) by Thomas
-Norrenbrock , 
-Timo Kaiser,  Sovan Biswas, Ramesh Manuvinakurike,
-and Bodo Rosenhahn, Q-SENN from the AAAI 2024 paper 
-[*Q-SENN: Quantized Self-Explaining Neural Network*](https://ojs.aaai.org/index.php/AAAI/article/view/30145) by Thomas
-Norrenbrock , 
-Marco Rudolph,
-and Bodo Rosenhahn
-and the SLDD-model from [*Take 5: 
-Interpretable Image Classification with a Handful of Features*](https://arxiv.org/pdf/2303.13166) (NeurIPS 
-Workshop) from the same authors is included.
-This repository extends [*QPM's*](https://github.com/ThomasNorr/qpm).
+The [Demo](https://huggingface.co/spaces/ThomasNorr/CHIQPM_Demo) was implemented by Sarah Secci.
+
+This repository extends [*QPM's*](https://github.com/ThomasNorr/qpm) and additionally includes:
+* **QPM** from the ICLR 2025 paper [*QPM: Discrete Optimization for Globally Interpretable Image Classification*](https://openreview.net/forum?id=GlAeL0I8LX) by Thomas Norrenbrock, Timo Kaiser, Sovan Biswas, Ramesh Manuvinakurike, and Bodo Rosenhahn.
+* **Q-SENN** from the AAAI 2024 paper [*Q-SENN: Quantized Self-Explaining Neural Network*](https://ojs.aaai.org/index.php/AAAI/article/view/30145) by Thomas Norrenbrock, Marco Rudolph, and Bodo Rosenhahn.
+* **SLDD-model** from [*Take 5: Interpretable Image Classification with a Handful of Features*](https://arxiv.org/pdf/2303.13166) (NeurIPS Workshop).
 
 <p align="center">
     <img height="300" src="fig/fig2Chiqpm.png"> 
