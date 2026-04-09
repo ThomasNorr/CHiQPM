@@ -3,7 +3,7 @@
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ThomasNorr/CHIQPM_Demo)
 
 This repository contains the code for the NeurIPS 2025 paper
-[*CHiQPM: Calibrated Hierarchical Interpretable Image Classification*](https://www.tnt.uni-hannover.de/papers/data/1801/Neurips2025_ChiQPM%20(12)%20(2).pdf) by Thomas
+[*CHiQPM: Calibrated Hierarchical Interpretable Image Classification*](https://arxiv.org/pdf/2511.20779) by Thomas
 Norrenbrock, Timo Kaiser, Sovan Biswas, Neslihan Kose, Ramesh Manuvinakurike, and Bodo Rosenhahn.
 
 The [Demo](https://huggingface.co/spaces/ThomasNorr/CHIQPM_Demo) was implemented by Sarah Secci.
