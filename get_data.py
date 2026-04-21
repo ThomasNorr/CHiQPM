@@ -191,12 +191,12 @@ def get_deeplab_preprocessed_data(img_size=224):
     train_transform = get_augmentation(
         jitter=0.1, size=img_size, training=True, 
         random_center_crop=False, trivialAug=True, hflip=True, 
-        normalize=normalize_params["CUB2011"], deeplab_crop=False
+        normalize=normalize_params["CUB2011"]
     )
     test_transform = get_augmentation(
         jitter=0.1, size=img_size, training=False, 
         random_center_crop=False, trivialAug=True, hflip=True, 
-        normalize=normalize_params["CUB2011"], deeplab_crop=False
+        normalize=normalize_params["CUB2011"]
     )
     
     train_dataset = CUB200DeepLabPreprocessed(True, train_transform)
