@@ -75,9 +75,9 @@ class HierarchicalExplainer(HieraDiffNonConformityScore):
             
         if global_plot:
             visualize_explanation_tree(global_hierarchy_data, gt_label, class_names, features, pred.item(),
-                                       prediction_set, folder, filename, feature_to_color_mapping)
+                                       prediction_set, folder, filename, feature_to_color_mapping, vertical_layout=True)
         else:
-            visualize_explanation_tree(hierarchy_data, gt_label,class_names, features,pred.item(),prediction_set,  folder, filename, feature_to_color_mapping,global_plot = global_plot)
+            visualize_explanation_tree(hierarchy_data, gt_label,class_names, features,pred.item(),prediction_set,  folder, filename, feature_to_color_mapping,global_plot = global_plot, vertical_layout=True)
 
     def build_graph_structure(self, logits, features, global_plot=False, 
                              feature_to_color_mapping=None, class_names=None):
@@ -137,13 +137,13 @@ class HierarchicalExplainer(HieraDiffNonConformityScore):
         # Build graph structure (extracted from visualize_explanation_tree_to_pil)
         cached_graph = self._build_graph_from_hierarchy(
             chosen_hierarchy, features, pred.item(), 
-            feature_to_color_mapping, class_names, global_plot
+            feature_to_color_mapping, class_names, global_plot,
         )
         
         return cached_graph
 
     def _build_graph_from_hierarchy(self, hierarchy_data, feature_activations, pred_idx,
-                                    feature_to_color_mapping, class_names, global_plot):
+                                    feature_to_color_mapping, class_names, global_plot,vertical_layout= False):
         """
         Internal method to build graph structure from hierarchy data.
         This is the expensive part we want to cache.
@@ -284,6 +284,11 @@ class HierarchicalExplainer(HieraDiffNonConformityScore):
 
         # Compute positions (expensive!)
         pos = get_smaller_v_space_pos(graph, root_idx)
+
+        if vertical_layout:
+            # Re-orient the tree 90 degrees back to Top-to-Bottom
+            # Assuming the current layout is Left-to-Right (X=depth, Y=breadth)
+            pos = {node: (coords[1], -coords[0]) for node, coords in pos.items()}
 
         # Return cached structure
         return CachedGraphStructure(

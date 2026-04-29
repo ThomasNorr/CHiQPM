@@ -25,7 +25,7 @@ Abstract:
 ---
 
 ## Installation
-You will need the usual libaries for deep learning, e.g. pytorch, 
+You will need the usual libraries for deep learning, e.g. pytorch, 
 torchvision, numpy, etc. The quadratic problem is solved using [Gurobi](https://www.gurobi.com/) and requires a license
 which is [free for academics](https://www.gurobi.com/academia/academic-program-and-licenses/).
 Additionally, 
@@ -65,7 +65,7 @@ respective folder under ~/tmp/datasets such that the final structure looks like
 The default paths could be changed in the dataset_classes or for Imagenet in 
 get_data.py
 
-Note: 
+**Note:** 
 If cropped images, like for PIP-Net, ProtoPool, etc. are desired, then the 
 crop_root should be set to a folder containing the cropped images in the 
 expected structure, obtained by following ProtoTree's instructions: 
@@ -76,7 +76,8 @@ can be set using an additional flag `--cropGT` introduced later.
 
 
 ## Usage
-The code to create a CHiQPM model can be started from the file main.py.
+The code to create a CHiQPM model can be started from the file `main.py`.
+
 Available parameters are:
 - `--dataset`: The dataset to use. Default: Cub2011
 - `--arch`: The backbone to use. Default: resnet50
@@ -100,12 +101,13 @@ python main.py --dataset StanfordCars
 **Note:**
 All experiments on ImageNet in the paper skipped the dense training from 
 scratch. The pretrained models are used directly.
-This can be replicated with the argument --do-dense False.
+This can be replicated with the argument --do_dense False.
 
 ## Visualizing the results
 We also include code to visualize the contrastive class explanations of the trained CHiQPM, loosely building upon [pytorch-grad-cam](https://github.com/jacobgil/pytorch-grad-cam).
-This can be done by running the file compare_classes.py with the same arguments used for training.
-For the uploaded CHiQPM, e.g. comparisons like this will be saved to the folder "~/tmp/TrainvizQPMClassComparisons":
+This can be done by running the file `compare_classes.py` with the same arguments used for training.
+
+For the uploaded CHiQPM, comparisons like the following will be saved to the folder "~/tmp/TrainvizQPMClassComparisons":
 <p align="center">
     <img height="200" src="fig/25_26.png"> 
 </p>
@@ -120,9 +122,11 @@ Here, we select the class examples for comparison via heuristics: The samples sh
 
 Note that the heatmaps transport certainty, as they are scaled based on the active mean of the feature (eqs. 24,25). 
 
-CHiQPM offers the novel hierarchical local explanations, which can be visualized using the file visualize_tree.py.
+CHiQPM offers the novel hierarchical local explanations, which can be visualized using the file `visualize_tree.py`.
 By default, it is configured to create a local explanation including heatmap and graph  (e.g. Fig. 2)  and a global 
-class comparison (e.g. Fig. 1)  for one sample each of the above classes. For example, with the uploaded CHiQPM, calibrated to guarantee 90% accuracy,
+class comparison (e.g. Fig. 1)  for one sample each of the above classes. 
+
+For example, with the uploaded CHiQPM, calibrated to guarantee 90% accuracy,
 these explanations will be created for the test image shown in the local explanation with index 657 and saved to 
 ~tmp/CHiQPMExplanations/SampleIndex_657/acc_0.9:
 
@@ -143,6 +147,15 @@ predicted to ensure 90% accuracy.
 
 Note that the colorcode for the features is consistent across all images.
 
+## Demo
+The hosted demo [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ThomasNorr/CHIQPM_Demo) can be locally run by starting the file `demo.py`.
+Before running the demo locally, `find_representatives.py` has to be run to find representative class samples used for the global explanations.
+The demo allows users to upload any image and see all the explanations shown above for it. 
+Specifically, one can also dynamically change the coverage level that is used for calibration and to generate the hierarchical explanation 
+and prediction set in the hierarchical explanation.
+<p align="center">
+    <img height="600" src="fig/DemoScreenshot.png"> 
+</p>
 ## Citations
 Please cite this work as:\
 CHiQPM

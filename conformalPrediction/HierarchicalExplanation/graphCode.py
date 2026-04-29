@@ -1,5 +1,7 @@
 import copy
 from pathlib import Path
+from tabnanny import verbose
+
 import networkx as nx
 import numpy as np
 import torch
@@ -22,7 +24,8 @@ def visualize_explanation_tree(
         filename: str,
         feature_to_color_mapping ={},
         global_plot: bool = True,
-        summarize_loc: bool = True
+        summarize_loc: bool = True,
+vertical_layout = True
 ):
     """
     Builds and saves a hierarchical explanation graph for a model's prediction on a sample.
@@ -196,7 +199,7 @@ def visualize_explanation_tree(
     # --- 6. Draw and Save the Main Plot ---
     edges = graph.edges()
     colors = [graph[u][v].get('color', "black") for u, v in edges]
-    pos = get_smaller_v_space_pos(graph, root_idx)
+    pos = get_smaller_v_space_pos(graph, root_idx, vertical_layout=vertical_layout)
 
     plt.figure(figsize=(10, 8))
     nx.draw(graph, pos, node_color=color_map, node_size=nodes_sizes, alpha=alpha, edge_color=colors,

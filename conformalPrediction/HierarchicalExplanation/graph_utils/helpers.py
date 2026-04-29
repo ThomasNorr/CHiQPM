@@ -46,9 +46,12 @@ def get_remapped_name(names, rel_class_names = None):
 
 
 
-def get_smaller_v_space_pos(graph, root_idx, ranksep=0.02, second_halfer=0.0001):
+def get_smaller_v_space_pos(graph, root_idx, ranksep=0.02, second_halfer=0.0001, vertical_layout=False):
     A = nx.nx_agraph.to_agraph(graph)
-    A.layout(prog='dot', args=f"-Granksep={ranksep} -Grankdir=LR")
+    if vertical_layout:
+        A.layout(prog='dot', args=f"-Granksep={ranksep}")
+    else:
+        A.layout(prog='dot', args=f"-Granksep={ranksep} -Grankdir=LR")
 
     pos = {}
 
