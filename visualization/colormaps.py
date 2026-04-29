@@ -22,6 +22,13 @@ def get_default_cmaps():
         [255 / 255, 20 / 255, 147 / 255],  # deep pink
         [128 / 255, 128 / 255, 0 / 255],  # olive
         [0 / 255, 0 / 255, 128 / 255],  # navy
+        [0 / 255, 100 / 255, 0 / 255],  # forest green
+        [100 / 255, 200 / 255, 255 / 255],  # light blue
+        [255 / 255, 100 / 255, 0 / 255],  # red-orange
+        [130 / 255, 200 / 255, 25 / 255],  # lime green
+        [255 / 255, 0 / 255, 100 / 255],  # pink
+        [25 / 255, 100 / 255, 200 / 255], # cornflower blue
+
     ]
 
     all_colors = good_colors + new_colors

@@ -9,16 +9,16 @@ from matplotlib import pyplot as plt
 from visualization.colormaps import get_default_cmaps
 
 
-def draw_labels(pos, labels, font_size=8, y_offset=-.0009):
+def draw_labels(pos, labels, font_size=8, x_offset= 0.002):
     for node, label in labels.items():
         if len(label) > 0:
             x, y = pos[node]
             label = label.replace(r"\\n", " ")
             if label.startswith("Bold"):
-                plt.text(x, y + y_offset, label.replace("Bold", ""), fontsize=font_size, ha='center', va='center',
+                plt.text(x + x_offset, y, label.replace("Bold", ""), fontsize=font_size, ha='left', va='center',
                          wrap=True, fontweight='bold')
             else:
-                plt.text(x, y + y_offset, label, fontsize=font_size, ha='center', va='center',
+                plt.text(x + x_offset, y, label, fontsize=font_size, ha='left', va='center',
                          wrap=True)
 
 
@@ -48,19 +48,13 @@ def get_remapped_name(names, rel_class_names = None):
 
 def get_smaller_v_space_pos(graph, root_idx, ranksep=0.02, second_halfer=0.0001):
     A = nx.nx_agraph.to_agraph(graph)
-    A.layout(prog='dot', args=f"-Granksep={ranksep}")
+    A.layout(prog='dot', args=f"-Granksep={ranksep} -Grankdir=LR")
 
     pos = {}
-    max_y = 0
 
     for node in A:
         x, y = map(float, node.attr['pos'].split(','))
-        pos[int(node)] = (x, y * second_halfer)  # Convert node name to string for NetworkX compatibility
-
-        if y * second_halfer > max_y and int(node) != root_idx:
-            max_y = y * second_halfer
-    delta_y = pos[root_idx][1] - max_y
-    pos[root_idx] = (pos[root_idx][0], pos[root_idx][1] - delta_y / 2)
+        pos[int(node)] = (x, y * second_halfer)
 
     return pos
 

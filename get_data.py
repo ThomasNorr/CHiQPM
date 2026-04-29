@@ -199,3 +199,154 @@ IMAGENET_PCA = {
         [-0.5836, -0.6948, 0.4203],
     ])
 }
+
+class DeepLabBirdCrop(object):
+    """
+    Crop bird using DeepLabV3 semantic segmentation with padding allowance
+    """
+    def __init__(self, padding=20, device=None):
+        from torchvision.models import segmentation
+        
+        self.model = segmentation.deeplabv3_resnet50(pretrained=True)
+        # self.model = self.model.to(self.device)
+        self.model.eval()
+        self.padding = padding
+        
+        self.deeplab_preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+    
+    def __call__(self, img):
+        if hasattr(img, 'mode'):  # PIL Image
+            input_tensor = self.deeplab_preprocess(img).unsqueeze(0)
+            # input_tensor = input_tensor.to(self.device)
+            
+            with torch.no_grad():
+                output = self.model(input_tensor)['out'][0]
+            
+            # Bird class in Pascal VOC is class 3
+            bird_mask = output.argmax(0) == 3
+            
+            if bird_mask.any():
+                # Find bounding box of bird
+                bird_pixels = torch.where(bird_mask)
+                y_min, y_max = bird_pixels[0].min(), bird_pixels[0].max()
+                x_min, x_max = bird_pixels[1].min(), bird_pixels[1].max()
+                
+                # Add padding allowance around the bird
+                img_width, img_height = img.size
+                x_min = max(0, int(x_min) - self.padding)
+                y_min = max(0, int(y_min) - self.padding)
+                x_max = min(img_width, int(x_max) + self.padding)
+                y_max = min(img_height, int(y_max) + self.padding)
+                
+                return img.crop((x_min, y_min, x_max, y_max))
+        
+        return img
+    
+class CUB200DeepLabPreprocessed(CUB200Class):
+    """CUB200 dataset using pre-processed DeepLab crops (fast loading)"""
+    
+    def __init__(self, train, transform, crop=False):
+        # Override the root to use preprocessed DeepLab crops
+        self.original_root = self.root
+        self.root = Path.home() / "tmp/Datasets/CUB200_DeepLab"
+        
+        # Initialize with the new root (never use PPCUB200 crops for DeepLab)
+        super().__init__(train, transform, crop=False)
+    
+    def __getitem__(self, idx):
+        # Regular loading - images are already DeepLab cropped
+        sample = self.data.iloc[idx]
+        path = self.root / self.base_folder / sample.filepath
+        target = sample.target - 1
+        
+        img = self.loader(path)
+        img = self.transform(img)
+        return img, target
+
+def get_deeplab_preprocessed_data(img_size=224):
+    """Get DataLoaders using pre-processed DeepLab cropped images"""
+    
+    # No DeepLab cropping in transforms since images are already cropped
+    train_transform = get_augmentation(
+        jitter=0.1, size=img_size, training=True, 
+        random_center_crop=False, trivialAug=True, hflip=True, 
+        normalize=normalize_params["CUB2011"]
+    )
+    test_transform = get_augmentation(
+        jitter=0.1, size=img_size, training=False, 
+        random_center_crop=False, trivialAug=True, hflip=True, 
+        normalize=normalize_params["CUB2011"]
+    )
+    
+    train_dataset = CUB200DeepLabPreprocessed(True, train_transform)
+    test_dataset = CUB200DeepLabPreprocessed(False, test_transform)
+    
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset, batch_size=16, shuffle=True, num_workers=8
+    )
+    test_loader = torch.utils.data.DataLoader(
+        test_dataset, batch_size=16, shuffle=False, num_workers=8
+    )
+    
+    return train_loader, test_loader
+    
+
+if __name__ == "__main__":
+    from PIL import Image
+    import matplotlib.pyplot as plt
+    import os
+
+    # Get all images from the Summerr Tanager directory
+    img_dir = Path.home() / "tmp" / "Datasets" / "CUB200" / "CUB_200_2011" / "images" / "140.Summer_Tanager"
+    image_files = [f for f in os.listdir(img_dir) if f.endswith('.jpg')]
+    image_files.sort()  # Sort for consistent ordering
+    
+    n_images = len(image_files)
+    cols = 3  # 3 columns: Original, DeepLab, Center Crop
+    rows = n_images
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(15, 5 * rows))
+    
+    # Handle case where there's only one image
+    if rows == 1:
+        axes = axes.reshape(1, -1)
+    
+    cropper = DeepLabBirdCrop(padding=20)
+    center_crop_transform = transforms.Compose([
+        transforms.Resize(448),
+        transforms.CenterCrop(448)
+    ])
+    
+    for i, img_file in enumerate(image_files):
+        img_path = img_dir / img_file
+        img = Image.open(img_path).convert("RGB")
+        
+        # DeepLab cropping
+        deeplab_cropped = cropper(img)
+        
+        # Center cropping
+        center_cropped = center_crop_transform(img)
+        
+        # Plot original
+        axes[i, 0].imshow(img)
+        axes[i, 0].set_title(f"Original: {img_file}")
+        axes[i, 0].axis('off')
+        
+        # Plot DeepLab cropped
+        axes[i, 1].imshow(deeplab_cropped)
+        axes[i, 1].set_title("DeepLab Cropped")
+        axes[i, 1].axis('off')
+        
+        # Plot center cropped
+        axes[i, 2].imshow(center_cropped)
+        axes[i, 2].set_title("Center Cropped")
+        axes[i, 2].axis('off')
+    
+    plt.tight_layout()
+    plt.savefig("all_summer_tanager_comparison.png", dpi=150, bbox_inches='tight')
+    plt.show()
+
+    print(f"Processed {n_images} images from 140.Summer_Tanager directory")
