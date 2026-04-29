@@ -156,6 +156,7 @@ and prediction set in the hierarchical explanation.
 <p align="center">
     <img height="600" src="fig/DemoScreenshot.png"> 
 </p>
+
 ## Citations
 Please cite this work as:\
 CHiQPM
