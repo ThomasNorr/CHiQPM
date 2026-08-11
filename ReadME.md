@@ -161,13 +161,13 @@ and prediction set in the hierarchical explanation.
 Please cite this work as:\
 CHiQPM
 ```bibtex
-@inproceedings{
-2025chiqpm,
-title={{CH}i{QPM}: Calibrated Hierarchical Interpretable Image Classification},
-author={Thomas Norrenbrock and Timo Kaiser and Sovan Biswas and Neslihan Kose and Ramesh Manuvinakurike and Bodo Rosenhahn},
-booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems},
-year={2025},
-url={https://openreview.net/forum?id=jDJUjqUies}
+@article{norrenbrock2026chiqpm,
+  title={CHiQPM: Calibrated hierarchical interpretable image classification},
+  author={Norrenbrock, Thomas and Kaiser, Timo and Biswas, Sovan and Kose, Neslihan and Manuvinakurike, Ramesh and Rosenhahn, Bodo},
+  journal={Advances in Neural Information Processing Systems},
+  volume={38},
+  pages={14396--14448},
+  year={2026}
 }
 ```
 QPM
