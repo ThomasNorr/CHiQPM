@@ -211,6 +211,44 @@ One pretrained Resnet50 QPM trained on CUB without the ground truth crop can be 
 
 One pretrained Resnet50 for Q-SENN on CUB can be obtained via this link: [Q-SENN-WithCrop](https://drive.google.com/drive/folders/1agWqKhcWOVWueV4Fzaowr80lQroCJFYn?usp=drive_link)
 
+Pretrained Resnet50 QPM and CHiQPM models on **ImageNet** can be obtained via this link: [QPM/CHiQPM-ImageNet](https://drive.google.com/drive/folders/1YwEFz7lqOUuTMFf9ItGHAX4FlfJ4WodM?usp=sharing)
+
+Both use 50 concepts with 5 per class. Place the two `.pth` files in one directory and load them with:
+
+```python
+from evaluation.load_model import load_model
+
+model, folder = load_model(dataset="ImageNet", arch="resnet50",
+                           model_type="chiqpm",        # or "qpm"
+                           n_features=50, n_per_class=5,
+                           reduced_strides=False,
+                           folder="/path/to/the/downloaded/folder")
+```
+
+Evaluating them with
+
+```python
+from get_data import get_data
+from evaluation.qpm_metrics import eval_model_on_all_qpm_metrics
+
+train_loader, test_loader = get_data("ImageNet", crop=False, img_size=224)
+metrics = eval_model_on_all_qpm_metrics(model, test_loader, train_loader)
+```
+
+gives:
+
+| | QPM | CHiQPM |
+|---|---|---|
+| Accuracy | 0.74306 | 0.75492 |
+| NFfeatures | 50 | 50 |
+| PerClass | 5.0 | 5.0 |
+| SID@5 | 0.7516 | 0.6017 |
+| Class-Independence | 0.9924 | 0.9872 |
+| Contrastiveness | 0.8802 | 0.9990 |
+| Correlation | 0.1239 | 0.2371 |
+
+(`Structural Grounding` is 0 for ImageNet; it is defined against CUB's attribute annotations.)
+
 ## Acknowledgement
 
 

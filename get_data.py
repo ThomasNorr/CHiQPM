@@ -93,7 +93,8 @@ def get_data(dataset, crop = True, img_size=448):
             ),
             transforms.ToTensor(),
             Lighting(0.05, IMAGENET_PCA['eigval'],
-                     IMAGENET_PCA['eigvec'])
+                     IMAGENET_PCA['eigvec']),
+            transforms.Normalize(**normalize_params["ImageNet"])
         ])
         """
         Standard training data augmentation for ImageNet-scale datasets: Random crop,
@@ -103,6 +104,7 @@ def get_data(dataset, crop = True, img_size=448):
             transforms.Resize(256),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
+            transforms.Normalize(**normalize_params["ImageNet"]),
         ])
         imgnet_root = Path.home()/ "tmp" /"Datasets"/ "imagenet"
         train_dataset = torchvision.datasets.ImageNet(root=imgnet_root, split='train',  transform=train_transform)
